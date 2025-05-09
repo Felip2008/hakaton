@@ -43,25 +43,130 @@ let coresIniciais = {
   }
 
   //escolher foto de perfil//
-  function escolherImagem() {
+  document.addEventListener('DOMContentLoaded', () => {
+    const ftPerfilDiv = document.getElementById('ft_perfil');
     const fileInput = document.getElementById('fileInput');
-    fileInput.click();
-  
-    fileInput.onchange = function () {
-      const file = fileInput.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const ftPerfil = document.getElementById('ft_perfil');
-          ftPerfil.style.backgroundImage = `url('${e.target.result}')`;
-          ftPerfil.style.backgroundSize = 'cover';
-          ftPerfil.style.backgroundPosition = 'center';
-        };
-        reader.readAsDataURL(file);
-      }
-      fileInput.value = '';
-    };
-  }
+    // ... outros elementos e listeners de evento ...
+
+    // --- Carregar a foto de perfil salva ao carregar a página ---
+    const fotoPerfilSalva = localStorage.getItem('foto_perfil_base64');
+    if (fotoPerfilSalva) {
+        ftPerfilDiv.style.backgroundImage = `url(${fotoPerfilSalva})`;
+    }
+
+    // --- Adicionar o listener de evento para o clique na div da foto de perfil ---
+    ftPerfilDiv.addEventListener('click', () => {
+        fileInput.click(); // Simula o clique no input de arquivo escondido
+    });
+
+    // --- Adicionar o listener de evento para quando um arquivo for selecionado ---
+    fileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0]; // Pega o primeiro arquivo selecionado
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const dataUrl = e.target.result; // A Data URL (Base64) da imagem
+
+                // Define a imagem de fundo da div
+                ftPerfilDiv.style.backgroundImage = `url(${dataUrl})`;
+
+                // --- Salvar a Data URL no localStorage ---
+                try {
+                    localStorage.setItem('foto_perfil_base64', dataUrl);
+                    console.log('Foto de perfil salva no localStorage.');
+                } catch (e) {
+                    console.error('Erro ao salvar a foto de perfil no localStorage:', e);
+                    alert('Não foi possível salvar a foto de perfil. O tamanho pode ser muito grande.');
+                }
+            };
+
+            // Lê o arquivo como uma Data URL
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // ... o restante do seu código (edição da bio, etc.) ...
+
+    // Exemplo de como adaptar a lógica de carregar/salvar bio para outros campos
+    function carregarDadosSalvos() {
+        const nomeSalvo = localStorage.getItem('nome_usuario');
+        if (nomeSalvo) {
+            document.getElementById('nome_bio').innerText = nomeSalvo;
+        }
+
+        const generoSalvo = localStorage.getItem('genero_usuario');
+        if (generoSalvo) {
+             document.getElementById('genero_bio').innerText = generoSalvo;
+        }
+        // Continue para idade, estado civil, carreira, formacao...
+        const idadeSalva = localStorage.getItem('idade_usuario');
+        if (idadeSalva) {
+            document.getElementById('idade_bio').innerText = idadeSalva;
+        }
+         const estadoCivilSalvo = localStorage.getItem('estadocivil_usuario');
+        if (estadoCivilSalvo) {
+            document.getElementById('estadocivil_bio').innerText = estadoCivilSalvo;
+        }
+         const carreiraSalva = localStorage.getItem('carreira_usuario');
+        if (carreiraSalva) {
+            document.getElementById('carreira_bio').innerText = carreiraSalva;
+        }
+        const formacaoSalva = localStorage.getItem('formacao_usuario');
+        if (formacaoSalva) {
+            document.getElementById('formacao_bio').innerText = formacaoSalva;
+        }
+    }
+
+    function salvarDados() {
+        const nomeAtual = document.getElementById('nome_bio').innerText;
+        localStorage.setItem('nome_usuario', nomeAtual);
+
+        const generoAtual = document.getElementById('genero_bio').innerText;
+        localStorage.setItem('genero_usuario', generoAtual);
+
+        // Continue para idade, estado civil, carreira, formacao...
+         const idadeAtual = document.getElementById('idade_bio').innerText;
+        localStorage.setItem('idade_usuario', idadeAtual);
+         const estadoCivilAtual = document.getElementById('estadocivil_bio').innerText;
+        localStorage.setItem('estadocivil_usuario', estadoCivilAtual);
+         const carreiraAtual = document.getElementById('carreira_bio').innerText;
+        localStorage.setItem('carreira_usuario', carreiraAtual);
+        const formacaoAtual = document.getElementById('formacao_bio').innerText;
+        localStorage.setItem('formacao_usuario', formacaoAtual);
+
+
+        alert('Alterações salvas!');
+    }
+
+    // Associa as funções aos botões, garantindo que carregam dados salvos na inicialização
+     const editarBioBtn = document.getElementById('editarBioBtn');
+     const salvarBioBtn = document.getElementById('salvarBioBtn');
+     const elementosEditaveis = document.querySelectorAll('.texto'); // Seleciona todos os elementos com a classe 'texto' que são editáveis
+
+     carregarDadosSalvos(); // Carrega os dados salvos ao carregar a página
+
+     editarBioBtn.addEventListener('click', () => {
+         elementosEditaveis.forEach(elemento => {
+             elemento.contentEditable = true;
+             elemento.style.border = '1px solid #ccc';
+         });
+         editarBioBtn.style.display = 'none';
+         salvarBioBtn.style.display = 'inline-block';
+     });
+
+     salvarBioBtn.addEventListener('click', () => {
+         salvarDados();
+
+         elementosEditaveis.forEach(elemento => {
+             elemento.contentEditable = false;
+             elemento.style.border = 'none';
+         });
+         salvarBioBtn.style.display = 'none';
+         editarBioBtn.style.display = 'inline-block';
+     });
+});
 
 //movimento do interruptor do modo escuro//
   window.onload = function () {
@@ -107,34 +212,7 @@ let coresIniciais = {
 
     let currentGenero = "Gênero";
     let currentEstadoCivil = "Est. Cívil";
-
-    //habilitar edição de bio//
-    function enableBioEdit() {
-      bioIdade.contentEditable = true;
-      bioCarreira.contentEditable = true;
-      bioFormacao.contentEditable = true;
-      nome.contentEditable=true;
-
-      generoContainer.innerHTML = `
-        <select id="genero_select" name="genero" class="year-select">
-          <option value="" disabled ${currentGenero === 'Gênero' ? 'selected' : ''}>Gênero</option>
-          <option value="Masculino" ${currentGenero === 'Masculino' ? 'selected' : ''}>Masculino</option>
-          <option value="Feminino" ${currentGenero === 'Feminino' ? 'selected' : ''}>Feminino</option>
-        </select>
-      `;
-
-      estadoCivilContainer.innerHTML = `
-        <select id="estadocivil_select" name="estado_civil" class="year-select">
-          <option value="" disabled ${currentEstadoCivil === 'Est. Cívil' ? 'selected' : ''}>Est. Cívil</option>
-          <option value="Solteiro" ${currentEstadoCivil === 'Solteiro' ? 'selected' : ''}>Solteiro</option>
-          <option value="Casado" ${currentEstadoCivil === 'Casado' ? 'selected' : ''}>Casado</option>
-        </select>
-      `;
-
-      editarBioBtn.style.display = 'none';
-      salvarBioBtn.style.display = 'inline-block';
-    }
-
+    
     //desabilitar edição de bio//
     function disableBioEdit() {
       bioIdade.contentEditable = false;

@@ -1,4 +1,4 @@
-// Script.js - Código Completo com Persistência no LocalStorage
+// Script.js - Código Completo com Persistência no LocalStorage (Multiplos Grupos de Imagens)
 
 //modo escuro//
 let coresIniciais = {
@@ -60,27 +60,54 @@ function mudaracor() {
   }
 }
 
-// --- Persistent Highlight Images ---
-const LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY = 'highlightImagesData'; // Key for localStorage
+// --- Persistent Highlight Images (Generic Functions) ---
 
-// Function to save highlight image data to localStorage
-function saveHighlightImageData(index, dataUrl) {
-  const savedImages = JSON.parse(localStorage.getItem(LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY)) || {};
+// Function to save image data for a specific key to localStorage
+function saveImageData(localStorageKey, index, dataUrl) {
+  const savedImages = JSON.parse(localStorage.getItem(localStorageKey)) || {};
   savedImages[index] = dataUrl;
-  localStorage.setItem(LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY, JSON.stringify(savedImages));
+  localStorage.setItem(localStorageKey, JSON.stringify(savedImages));
 }
 
-// Function to load and apply highlight image data from localStorage
-function loadAndApplyHighlightImages() {
-  const savedImages = JSON.parse(localStorage.getItem(LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY));
+// Function to load and apply image data for a specific key from localStorage
+function loadAndApplyImages(selector, localStorageKey) {
+  const savedImages = JSON.parse(localStorage.getItem(localStorageKey));
   if (savedImages) {
-      const imagens = document.querySelectorAll('.img_destaque');
+      const imagens = document.querySelectorAll(selector);
       imagens.forEach((img, index) => {
           if (savedImages[index]) {
               img.src = savedImages[index];
           }
       });
   }
+}
+
+// Function to set up click listeners for a group of images
+function setupImageListeners(selector, localStorageKey) {
+   const imagens = document.querySelectorAll(selector);
+   imagens.forEach((img, index) => {
+       img.addEventListener('click', () => {
+           const input = document.createElement('input');
+           input.type = 'file';
+           input.accept = 'image/*';
+           input.addEventListener('change', (event) => {
+               const file = event.target.files[0];
+               if (file) {
+                   const reader = new FileReader();
+                   reader.onload = function (e) {
+                       const dataUrl = e.target.result;
+                       img.src = dataUrl; // Update the image source
+
+                       // --- Save the Data URL and image index using the specific key ---
+                       saveImageData(localStorageKey, index, dataUrl);
+
+                   };
+                   reader.readAsDataURL(file);
+               }
+           });
+           input.click();
+       });
+   });
 }
 
 
@@ -243,33 +270,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 
-  // --- Imagens de Destaque: Carregar salvas e adicionar listeners ---
-  loadAndApplyHighlightImages(); // Load saved images on page load
+  // --- Imagens de Destaque: Configurar para cada classe ---
 
-  const imagensDestaque = document.querySelectorAll('.img_destaque');
-  imagensDestaque.forEach((img, index) => {
-      img.addEventListener('click', () => {
-          const input = document.createElement('input');
-          input.type = 'file';
-          input.accept = 'image/*';
-          input.addEventListener('change', (event) => {
-              const file = event.target.files[0];
-              if (file) {
-                  const reader = new FileReader();
-                  reader.onload = function (e) {
-                      const dataUrl = e.target.result;
-                      img.src = dataUrl; // Update the image source
+    // Configure images with class .img_destaque_p
+    const LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY = 'highlightImagesData';
+    loadAndApplyImages('.img_destaque', LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY);
+    setupImageListeners('.img_destaque', LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY);
 
-                      // --- Save the Data URL and image index to localStorage ---
-                      saveHighlightImageData(index, dataUrl);
+  // Configure images with class .img_destaque_p
+  const LOCAL_STORAGE_HIGHLIGHT_IMAGES_P_KEY = 'highlightImagesPData';
+  loadAndApplyImages('.img_destaque_p', LOCAL_STORAGE_HIGHLIGHT_IMAGES_P_KEY);
+  setupImageListeners('.img_destaque_p', LOCAL_STORAGE_HIGHLIGHT_IMAGES_P_KEY);
 
-                  };
-                  reader.readAsDataURL(file);
-              }
-          });
-          input.click();
-      });
-  });
+  // Configure images with class .img_destaque_c
+  const LOCAL_STORAGE_HIGHLIGHT_IMAGES_C_KEY = 'highlightImagesCData';
+  loadAndApplyImages('.img_destaque_c', LOCAL_STORAGE_HIGHLIGHT_IMAGES_C_KEY);
+  setupImageListeners('.img_destaque_c', LOCAL_STORAGE_HIGHLIGHT_IMAGES_C_KEY);
+
+  // If you also have images with class .img_destaque, uncomment and configure them as well
+  // const LOCAL_STORAGE_HIGHLIGHT_IMAGES_DEFAULT_KEY = 'highlightImagesData';
+  // loadAndApplyImages('.img_destaque', LOCAL_STORAGE_HIGHLIGHT_IMAGES_DEFAULT_KEY);
+  // setupImageListeners('.img_destaque', LOCAL_STORAGE_HIGHLIGHT_IMAGES_DEFAULT_KEY);
 
 
   // --- Bio Data: Carregar salva e adicionar listeners ---
@@ -277,20 +298,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
    const editarBioBtn = document.getElementById('editarBioBtn');
    const salvarBioBtn = document.getElementById('salvarBioBtn');
-   const elementosEditaveisBio = document.querySelectorAll('.texto'); // Seleciona elementos da bio (ajustar se a classe 'texto' for mais ampla)
+   // Selecionar elementos da bio de forma mais robusta
+   const elementosEditaveisBio = [
+       document.getElementById('nome_bio'),
+       document.getElementById('genero_bio'),
+       document.getElementById('idade_bio'),
+       document.getElementById('estadocivil_bio'),
+       document.getElementById('carreira_bio'),
+       document.getElementById('formacao_bio')
+   ].filter(el => el !== null); // Filtra por elementos que existem
 
 
    if(editarBioBtn && salvarBioBtn && elementosEditaveisBio.length > 0) {
        editarBioBtn.addEventListener('click', () => {
             elementosEditaveisBio.forEach(elemento => {
-                // Considerar apenas elementos da bio para edição
-                 if (elemento.id.includes('_bio')) {
-                     elemento.contentEditable = true;
-                     // Adicionar borda para indicar que é editável (opcional)
-                     elemento.style.border = '1px solid #ccc';
-                     elemento.style.padding = '5px'; // Adicionar padding para a borda não grudar no texto
-                 }
-            });
+                 elemento.contentEditable = true;
+                 elemento.style.border = '1px solid #ccc';
+                 elemento.style.padding = '5px';
+             });
             editarBioBtn.style.display = 'none';
             salvarBioBtn.style.display = 'inline-block';
        });
@@ -299,13 +324,10 @@ document.addEventListener('DOMContentLoaded', () => {
             saveBioData(); // Salvar dados da bio
 
             elementosEditaveisBio.forEach(elemento => {
-                 if (elemento.id.includes('_bio')) {
-                     elemento.contentEditable = false;
-                     // Remover borda (opcional)
-                     elemento.style.border = 'none';
-                     elemento.style.padding = '0'; // Remover padding
-                 }
-            });
+                 elemento.contentEditable = false;
+                 elemento.style.border = 'none';
+                 elemento.style.padding = '0';
+             });
             salvarBioBtn.style.display = 'none';
             editarBioBtn.style.display = 'inline-block';
        });

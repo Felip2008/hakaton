@@ -1,310 +1,405 @@
+// Script.js - Código Completo com Persistência no LocalStorage
+
 //modo escuro//
 let coresIniciais = {
-    box1: '#777777',
-    box2: '#ffffff',
-    text: '#000000'
+  box1: '#777777',
+  box2: '#ffffff',
+  text: '#000000'
+};
+let novasCores = {
+  box1: '#0f0f0f',
+  box2: '#252525',
+  text: '#ffffff'
+};
+
+let initialTextColors = {};
+const LOCAL_STORAGE_THEME_KEY = 'modoEscuroAtivado'; // Key for localStorage
+
+// Function to apply the theme (light or dark)
+function aplicarTema(isDarkMode) {
+  const box1 = document.querySelector('.box1');
+  const box2 = document.querySelector('.box2');
+  const textos = document.querySelectorAll('.texto');
+  const navbar = document.querySelector('.navbar');
+
+  if (box1 && box2 && textos) { // Check if elements exist
+      if (isDarkMode) {
+          box1.style.backgroundColor = novasCores.box1;
+          box2.style.backgroundColor = novasCores.box2;
+          textos.forEach(texto => {
+              texto.style.color = novasCores.text;
+          });
+          if (navbar) {
+              navbar.setAttribute('data-bs-theme', 'dark');
+          }
+      } else {
+          box1.style.backgroundColor = coresIniciais.box1;
+          box2.style.backgroundColor = coresIniciais.box2;
+          textos.forEach(texto => {
+               // Restaura a cor inicial salva ou usa a cor inicial padrão do texto
+              texto.style.color = initialTextColors[texto] || coresIniciais.text;
+          });
+          if (navbar) {
+              navbar.setAttribute('data-bs-theme', 'light'); // Or whatever your initial theme was
+          }
+      }
+  }
+}
+
+// Function triggered by the switch
+function mudaracor() {
+  const chaveSeletora = document.getElementById('switch-shadow');
+  if (chaveSeletora) {
+      const isDarkMode = chaveSeletora.checked;
+
+      // Apply the theme based on the switch state
+      aplicarTema(isDarkMode);
+
+      // --- Save the preference to localStorage ---
+      localStorage.setItem(LOCAL_STORAGE_THEME_KEY, isDarkMode);
+  }
+}
+
+// --- Persistent Highlight Images ---
+const LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY = 'highlightImagesData'; // Key for localStorage
+
+// Function to save highlight image data to localStorage
+function saveHighlightImageData(index, dataUrl) {
+  const savedImages = JSON.parse(localStorage.getItem(LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY)) || {};
+  savedImages[index] = dataUrl;
+  localStorage.setItem(LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY, JSON.stringify(savedImages));
+}
+
+// Function to load and apply highlight image data from localStorage
+function loadAndApplyHighlightImages() {
+  const savedImages = JSON.parse(localStorage.getItem(LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY));
+  if (savedImages) {
+      const imagens = document.querySelectorAll('.img_destaque');
+      imagens.forEach((img, index) => {
+          if (savedImages[index]) {
+              img.src = savedImages[index];
+          }
+      });
+  }
+}
+
+
+// --- Persistent Project Names ---
+const LOCAL_STORAGE_PROJECT_NAMES_KEY = 'projectNames'; // Key for localStorage
+
+// Function to save project name data to localStorage
+function saveProjectName(index, name) {
+  const savedNames = JSON.parse(localStorage.getItem(LOCAL_STORAGE_PROJECT_NAMES_KEY)) || {};
+  savedNames[index] = name;
+  localStorage.setItem(LOCAL_STORAGE_PROJECT_NAMES_KEY, JSON.stringify(savedNames));
+}
+
+// Function to load and apply project name data from localStorage
+function loadAndApplyProjectNames() {
+  const savedNames = JSON.parse(localStorage.getItem(LOCAL_STORAGE_PROJECT_NAMES_KEY));
+  if (savedNames) {
+      const projectNames = document.querySelectorAll('#projeto_nome');
+      projectNames.forEach((nameElement, index) => {
+          if (savedNames[index]) {
+              nameElement.textContent = savedNames[index];
+          }
+      });
+  }
+}
+
+// --- Persistent Project Texts ---
+const LOCAL_STORAGE_PROJECT_TEXTS_KEY = 'projectTexts'; // Key for localStorage
+
+// Function to save project text data to localStorage
+function saveProjectText(index, text) {
+  const savedTexts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_PROJECT_TEXTS_KEY)) || {};
+  savedTexts[index] = text;
+  localStorage.setItem(LOCAL_STORAGE_PROJECT_TEXTS_KEY, JSON.stringify(savedTexts));
+}
+
+// Function to load and apply project text data from localStorage
+function loadAndApplyProjectTexts() {
+  const savedTexts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_PROJECT_TEXTS_KEY));
+  if (savedTexts) {
+      const projectTexts = document.querySelectorAll('#project_text');
+      projectTexts.forEach((textElement, index) => {
+          if (savedTexts[index]) {
+              textElement.value = savedTexts[index];
+          }
+      });
+  }
+}
+
+
+// --- Persistent Bio Data ---
+const LOCAL_STORAGE_BIO_KEY = 'bioData'; // Key for localStorage
+
+// Function to save bio data to localStorage
+function saveBioData() {
+  const bioData = {
+      nome: document.getElementById('nome_bio')?.innerText || '',
+      genero: document.getElementById('genero_bio')?.innerText || '',
+      idade: document.getElementById('idade_bio')?.innerText || '',
+      estado_civil: document.getElementById('estadocivil_bio')?.innerText || '',
+      carreira: document.getElementById('carreira_bio')?.innerText || '',
+      formacao: document.getElementById('formacao_bio')?.innerText || ''
   };
-  let novasCores = {
-    box1: '#0f0f0f',
-    box2: '#252525',
-    text: '#ffffff'
-  };
-  
-  let initialTextColors = {};
+  localStorage.setItem(LOCAL_STORAGE_BIO_KEY, JSON.stringify(bioData));
+   alert('Alterações da Bio salvas!');
+}
 
-  function mudaracor() {
-    const box1 = document.querySelector('.box1');
-    const box2 = document.querySelector('.box2');
-    const textos = document.querySelectorAll('.texto');
-    const chaveSeletora = document.getElementById('switch-shadow');
+// Function to load and apply bio data from localStorage
+function loadAndApplyBioData() {
+  const savedBioData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_BIO_KEY));
+  if (savedBioData) {
+      if(document.getElementById('nome_bio')) document.getElementById('nome_bio').innerText = savedBioData.nome;
+      if(document.getElementById('genero_bio')) document.getElementById('genero_bio').innerText = savedBioData.genero;
+      if(document.getElementById('idade_bio')) document.getElementById('idade_bio').innerText = savedBioData.idade;
+      if(document.getElementById('estadocivil_bio')) document.getElementById('estadocivil_bio').innerText = savedBioData.estado_civil;
+      if(document.getElementById('carreira_bio')) document.getElementById('carreira_bio').innerText = savedBioData.carreira;
+      if(document.getElementById('formacao_bio')) document.getElementById('formacao_bio').innerText = savedBioData.formacao;
+  }
+}
 
-    if (!coresIniciais.box1) {
-      coresIniciais.box1 = box1.style.backgroundColor;
-      coresIniciais.box2 = box2.style.backgroundColor;
 
+// --- Executar ao carregar a página (DOMContentLoaded é preferível a window.onload) ---
+document.addEventListener('DOMContentLoaded', () => {
+
+  // --- Modo Escuro: Carregar preferência salva e adicionar listener ---
+  const chaveSeletora = document.getElementById('switch-shadow');
+  const textos = document.querySelectorAll('.texto');
+
+  // Salvar as cores iniciais do texto na primeira carga
+   if (Object.keys(initialTextColors).length === 0) {
       textos.forEach(texto => {
-        initialTextColors[texto] = window.getComputedStyle(texto).color;
+          initialTextColors[texto] = window.getComputedStyle(texto).color;
       });
-    }
-
-    if (chaveSeletora.checked) {
-      box1.style.backgroundColor = novasCores.box1;
-      box2.style.backgroundColor = novasCores.box2;
-      textos.forEach(texto => {
-        texto.style.color = novasCores.text;
-      });
-    } else {
-      box1.style.backgroundColor = coresIniciais.box1;
-      box2.style.backgroundColor = coresIniciais.box2;
-      textos.forEach(texto => {
-        texto.style.color = initialTextColors[texto] || coresIniciais.text;
-      });
-    }
   }
 
-  //escolher foto de perfil//
-  document.addEventListener('DOMContentLoaded', () => {
-    const ftPerfilDiv = document.getElementById('ft_perfil');
-    const fileInput = document.getElementById('fileInput');
-    // ... outros elementos e listeners de evento ...
+  const savedTheme = localStorage.getItem(LOCAL_STORAGE_THEME_KEY);
 
-    // --- Carregar a foto de perfil salva ao carregar a página ---
-    const fotoPerfilSalva = localStorage.getItem('foto_perfil_base64');
-    if (fotoPerfilSalva) {
-        ftPerfilDiv.style.backgroundImage = `url(${fotoPerfilSalva})`;
-    }
+  if (savedTheme !== null) { // Se houver uma preferência salva
+      const isDarkModeSaved = savedTheme === 'true'; // localStorage armazena como string
 
-    // --- Adicionar o listener de evento para o clique na div da foto de perfil ---
-    ftPerfilDiv.addEventListener('click', () => {
-        fileInput.click(); // Simula o clique no input de arquivo escondido
-    });
+      // Define o estado do switch e aplica o tema salvo
+      if(chaveSeletora) chaveSeletora.checked = isDarkModeSaved;
+      aplicarTema(isDarkModeSaved);
+  } else {
+       // Apply default theme (light) if no preference is saved
+       aplicarTema(false);
+       // O switch já deve estar no estado inicial (desmarcado) por padrão no HTML
+  }
 
-    // --- Adicionar o listener de evento para quando um arquivo for selecionado ---
-    fileInput.addEventListener('change', (event) => {
-        const file = event.target.files[0]; // Pega o primeiro arquivo selecionado
-
-        if (file) {
-            const reader = new FileReader();
-
-            reader.onload = (e) => {
-                const dataUrl = e.target.result; // A Data URL (Base64) da imagem
-
-                // Define a imagem de fundo da div
-                ftPerfilDiv.style.backgroundImage = `url(${dataUrl})`;
-
-                // --- Salvar a Data URL no localStorage ---
-                try {
-                    localStorage.setItem('foto_perfil_base64', dataUrl);
-                    console.log('Foto de perfil salva no localStorage.');
-                } catch (e) {
-                    console.error('Erro ao salvar a foto de perfil no localStorage:', e);
-                    alert('Não foi possível salvar a foto de perfil. O tamanho pode ser muito grande.');
-                }
-            };
-
-            // Lê o arquivo como uma Data URL
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // ... o restante do seu código (edição da bio, etc.) ...
-
-    // Exemplo de como adaptar a lógica de carregar/salvar bio para outros campos
-    function carregarDadosSalvos() {
-        const nomeSalvo = localStorage.getItem('nome_usuario');
-        if (nomeSalvo) {
-            document.getElementById('nome_bio').innerText = nomeSalvo;
-        }
-
-        const generoSalvo = localStorage.getItem('genero_usuario');
-        if (generoSalvo) {
-             document.getElementById('genero_bio').innerText = generoSalvo;
-        }
-        // Continue para idade, estado civil, carreira, formacao...
-        const idadeSalva = localStorage.getItem('idade_usuario');
-        if (idadeSalva) {
-            document.getElementById('idade_bio').innerText = idadeSalva;
-        }
-         const estadoCivilSalvo = localStorage.getItem('estadocivil_usuario');
-        if (estadoCivilSalvo) {
-            document.getElementById('estadocivil_bio').innerText = estadoCivilSalvo;
-        }
-         const carreiraSalva = localStorage.getItem('carreira_usuario');
-        if (carreiraSalva) {
-            document.getElementById('carreira_bio').innerText = carreiraSalva;
-        }
-        const formacaoSalva = localStorage.getItem('formacao_usuario');
-        if (formacaoSalva) {
-            document.getElementById('formacao_bio').innerText = formacaoSalva;
-        }
-    }
-
-    function salvarDados() {
-        const nomeAtual = document.getElementById('nome_bio').innerText;
-        localStorage.setItem('nome_usuario', nomeAtual);
-
-        const generoAtual = document.getElementById('genero_bio').innerText;
-        localStorage.setItem('genero_usuario', generoAtual);
-
-        // Continue para idade, estado civil, carreira, formacao...
-         const idadeAtual = document.getElementById('idade_bio').innerText;
-        localStorage.setItem('idade_usuario', idadeAtual);
-         const estadoCivilAtual = document.getElementById('estadocivil_bio').innerText;
-        localStorage.setItem('estadocivil_usuario', estadoCivilAtual);
-         const carreiraAtual = document.getElementById('carreira_bio').innerText;
-        localStorage.setItem('carreira_usuario', carreiraAtual);
-        const formacaoAtual = document.getElementById('formacao_bio').innerText;
-        localStorage.setItem('formacao_usuario', formacaoAtual);
+  // Add the event listener for the switch
+  if (chaveSeletora) {
+      chaveSeletora.addEventListener('change', mudaracor);
+  }
 
 
-        alert('Alterações salvas!');
-    }
+  // --- Foto de Perfil: Carregar salva e adicionar listeners ---
+  const ftPerfilDiv = document.getElementById('ft_perfil');
+  const fileInput = document.getElementById('fileInput');
 
-    // Associa as funções aos botões, garantindo que carregam dados salvos na inicialização
-     const editarBioBtn = document.getElementById('editarBioBtn');
-     const salvarBioBtn = document.getElementById('salvarBioBtn');
-     const elementosEditaveis = document.querySelectorAll('.texto'); // Seleciona todos os elementos com a classe 'texto' que são editáveis
+  // Carregar a foto de perfil salva ao carregar a página
+  const fotoPerfilSalva = localStorage.getItem('foto_perfil_base64');
+  if (fotoPerfilSalva && ftPerfilDiv) {
+      ftPerfilDiv.style.backgroundImage = `url(${fotoPerfilSalva})`;
+  }
 
-     carregarDadosSalvos(); // Carrega os dados salvos ao carregar a página
-
-     editarBioBtn.addEventListener('click', () => {
-         elementosEditaveis.forEach(elemento => {
-             elemento.contentEditable = true;
-             elemento.style.border = '1px solid #ccc';
-         });
-         editarBioBtn.style.display = 'none';
-         salvarBioBtn.style.display = 'inline-block';
-     });
-
-     salvarBioBtn.addEventListener('click', () => {
-         salvarDados();
-
-         elementosEditaveis.forEach(elemento => {
-             elemento.contentEditable = false;
-             elemento.style.border = 'none';
-         });
-         salvarBioBtn.style.display = 'none';
-         editarBioBtn.style.display = 'inline-block';
-     });
-});
-
-//movimento do interruptor do modo escuro//
-  window.onload = function () {
-    const switchShadow = document.getElementById('switch-shadow');
-    if (switchShadow) {
-      switchShadow.addEventListener('change', mudaracor);
-    }
-
-    const dropdown = document.querySelector('.dropdown');
-    const dropdownToggle = document.querySelector('.dropdown-toggle');
-    const dropdownMenu = document.querySelector('.dropdown-menu');
-    const dropdownItems = document.querySelectorAll('.dropdown-item');
-
-    if (dropdownToggle) {
-      dropdownToggle.addEventListener('click', () => {
-        dropdown.classList.toggle('open');
+  // Adicionar o listener de evento para o clique na div da foto de perfil
+  if (ftPerfilDiv && fileInput) {
+      ftPerfilDiv.addEventListener('click', () => {
+          fileInput.click();
       });
+  }
 
-      dropdownItems.forEach(item => {
-        item.addEventListener('click', () => {
-          dropdownToggle.textContent = item.textContent;
-          dropdown.classList.remove('open');
-        });
-      });
-
-      document.addEventListener('click', (event) => {
-        if (!dropdown.contains(event.target)) {
-          dropdown.classList.remove('open');
-        }
-      });
-    }
-
-    //editar bio//
-    const editarBioBtn = document.getElementById('editarBioBtn');
-    const salvarBioBtn = document.getElementById('salvarBioBtn');
-    const bioIdade = document.getElementById('idade_bio');
-    const bioVida = document.getElementById('vida_bio');
-    const bioCarreira = document.getElementById('carreira_bio');
-    const bioFormacao = document.getElementById('formacao_bio');
-    const generoContainer = document.getElementById('bio_genero_container');
-    const estadoCivilContainer = document.getElementById('bio_estadocivil_container');
-    const nome = document.getElementById('bio_nome_container');
-
-    let currentGenero = "Gênero";
-    let currentEstadoCivil = "Est. Cívil";
-    
-    //desabilitar edição de bio//
-    function disableBioEdit() {
-      bioIdade.contentEditable = false;
-      bioCarreira.contentEditable = false;
-      bioFormacao.contentEditable = false;
-      nome.contentEditable = false;
-
-      const generoSelect = document.getElementById('genero_select');
-      const estadoCivilSelect = document.getElementById('estadocivil_select');
-
-      if (generoSelect) {
-        currentGenero = generoSelect.value || "Gênero";
-        generoContainer.innerHTML = `<p id="genero_bio" class="texto" data-bio-type="genero">${generoSelect.options[generoSelect.selectedIndex]?.text || "Gênero"}</p>`;
-      }
-
-      if (estadoCivilSelect) {
-        currentEstadoCivil = estadoCivilSelect.value || "Est. Cívil";
-        estadoCivilContainer.innerHTML = `<p id="estadocivil_bio" class="texto" data-bio-type="estado_civil">${estadoCivilSelect.options[estadoCivilSelect.selectedIndex]?.text || "Est. Cívil"}</p>`;
-      }
-
-      editarBioBtn.style.display = 'inline-block';
-      salvarBioBtn.style.display = 'none';
-
-      console.log('Bio Salva!');
-      console.log('Idade:', bioIdade.textContent);
-      console.log('Carreira:', bioCarreira.textContent);
-      console.log('Formação:', bioFormacao.textContent);
-      console.log('Gênero:', currentGenero);
-      console.log('Estado Civil:', currentEstadoCivil);
-      console.log(nome.textContent)
-    }
-
-    editarBioBtn.addEventListener('click', enableBioEdit);
-    salvarBioBtn.addEventListener('click', disableBioEdit);
-
-    //alterar imagem destaque//
-    const imagens = document.querySelectorAll('.img_destaque');
-    imagens.forEach((img) => {
-      img.addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.addEventListener('change', (event) => {
+  // Adicionar o listener de evento para quando um arquivo for selecionado para a foto de perfil
+  if (fileInput) {
+      fileInput.addEventListener('change', (event) => {
           const file = event.target.files[0];
+
           if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-              img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+              const reader = new FileReader();
+
+              reader.onload = (e) => {
+                  const dataUrl = e.target.result;
+
+                  if (ftPerfilDiv) {
+                      ftPerfilDiv.style.backgroundImage = `url(${dataUrl})`;
+                  }
+
+                  // Salvar a Data URL no localStorage
+                  try {
+                      localStorage.setItem('foto_perfil_base64', dataUrl);
+                      console.log('Foto de perfil salva no localStorage.');
+                  } catch (e) {
+                      console.error('Erro ao salvar a foto de perfil no localStorage:', e);
+                      alert('Não foi possível salvar a foto de perfil. O tamanho pode ser muito grande.');
+                  }
+              };
+              reader.readAsDataURL(file);
           }
-        });
-        input.click();
       });
-    });
-  };
+  }
 
-  document.addEventListener("DOMContentLoaded", function() {
-    // Selecione o elemento <p> pelo id
-    const projetoBio = document.getElementById("projeto_bio");
 
-    // Adiciona um evento de clique para tornar o conteúdo editável
-    projetoBio.addEventListener("click", function() {
-        // Cria um campo de input para o usuário editar o texto
-        let currentText = projetoBio.innerText;
-        projetoBio.innerHTML = `<input type="text" value="${currentText}" id="editProjeto">`;
+  // --- Imagens de Destaque: Carregar salvas e adicionar listeners ---
+  loadAndApplyHighlightImages(); // Load saved images on page load
 
-        // Quando o campo de texto perder o foco (blur), o texto é salvo
-        const inputField = document.getElementById("editProjeto");
-        inputField.addEventListener("blur", function() {
-            projetoBio.innerHTML = inputField.value;
-        });
+  const imagensDestaque = document.querySelectorAll('.img_destaque');
+  imagensDestaque.forEach((img, index) => {
+      img.addEventListener('click', () => {
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.accept = 'image/*';
+          input.addEventListener('change', (event) => {
+              const file = event.target.files[0];
+              if (file) {
+                  const reader = new FileReader();
+                  reader.onload = function (e) {
+                      const dataUrl = e.target.result;
+                      img.src = dataUrl; // Update the image source
 
-        // Também podemos adicionar um evento de "enter" para salvar ao pressionar Enter
-        inputField.addEventListener("keydown", function(event) {
-            if (event.key === "Enter") {
-                projetoBio.innerHTML = inputField.value;
-            }
-        });
-    });
+                      // --- Save the Data URL and image index to localStorage ---
+                      saveHighlightImageData(index, dataUrl);
+
+                  };
+                  reader.readAsDataURL(file);
+              }
+          });
+          input.click();
+      });
+  });
+
+
+  // --- Bio Data: Carregar salva e adicionar listeners ---
+   loadAndApplyBioData(); // Carrega os dados da bio salvos ao carregar a página
+
+   const editarBioBtn = document.getElementById('editarBioBtn');
+   const salvarBioBtn = document.getElementById('salvarBioBtn');
+   const elementosEditaveisBio = document.querySelectorAll('.texto'); // Seleciona elementos da bio (ajustar se a classe 'texto' for mais ampla)
+
+
+   if(editarBioBtn && salvarBioBtn && elementosEditaveisBio.length > 0) {
+       editarBioBtn.addEventListener('click', () => {
+            elementosEditaveisBio.forEach(elemento => {
+                // Considerar apenas elementos da bio para edição
+                 if (elemento.id.includes('_bio')) {
+                     elemento.contentEditable = true;
+                     // Adicionar borda para indicar que é editável (opcional)
+                     elemento.style.border = '1px solid #ccc';
+                     elemento.style.padding = '5px'; // Adicionar padding para a borda não grudar no texto
+                 }
+            });
+            editarBioBtn.style.display = 'none';
+            salvarBioBtn.style.display = 'inline-block';
+       });
+
+       salvarBioBtn.addEventListener('click', () => {
+            saveBioData(); // Salvar dados da bio
+
+            elementosEditaveisBio.forEach(elemento => {
+                 if (elemento.id.includes('_bio')) {
+                     elemento.contentEditable = false;
+                     // Remover borda (opcional)
+                     elemento.style.border = 'none';
+                     elemento.style.padding = '0'; // Remover padding
+                 }
+            });
+            salvarBioBtn.style.display = 'none';
+            editarBioBtn.style.display = 'inline-block';
+       });
+   }
+
+
+  // --- Project Names: Carregar salvos e adicionar listeners ---
+  loadAndApplyProjectNames(); // Load saved project names
+
+  const projectNames = document.querySelectorAll('#projeto_nome'); // Select all elements with id 'projeto_nome'
+  projectNames.forEach((projectNameElement, index) => {
+      projectNameElement.addEventListener('click', () => {
+          projectNameElement.contentEditable = true;
+          projectNameElement.focus();
+           // Optional: Select all text when focusing
+          const range = document.createRange();
+          range.selectNodeContents(projectNameElement);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+      });
+
+      projectNameElement.addEventListener('blur', () => {
+          projectNameElement.contentEditable = false;
+          const currentName = projectNameElement.textContent;
+          console.log(`Project name updated to: ${currentName}`);
+
+          // Save the updated name to localStorage
+          saveProjectName(index, currentName);
+      });
+
+       // Optional: Save on Enter key as well
+      projectNameElement.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+               event.preventDefault(); // Prevent newline
+               projectNameElement.contentEditable = false;
+               const currentName = projectNameElement.textContent;
+               console.log(`Project name updated to: ${currentName}`);
+
+               // Save the updated name to localStorage
+               saveProjectName(index, currentName);
+          }
+      });
+  });
+
+
+  // --- Project Texts: Carregar salvos e adicionar listeners ---
+   loadAndApplyProjectTexts(); // Load saved project texts
+
+   const projectTexts = document.querySelectorAll('#project_text'); // Select all elements with id 'project_text'
+   projectTexts.forEach((projectTextElement, index) => {
+       // Use 'input' event for textareas to save as the user types
+       projectTextElement.addEventListener('input', () => {
+           const currentText = projectTextElement.value;
+           // Save the updated text to localStorage on input
+           saveProjectText(index, currentText);
+       });
+
+       // Optional: Save on blur as a fallback
+       projectTextElement.addEventListener('blur', () => {
+           const currentText = projectTextElement.value;
+            saveProjectText(index, currentText);
+       });
+   });
+
+
+  // --- Outras lógicas (como o dropdown) ---
+   const dropdown = document.querySelector('.dropdown');
+   const dropdownToggle = document.querySelector('.dropdown-toggle');
+   const dropdownMenu = document.querySelector('.dropdown-menu');
+   const dropdownItems = document.querySelectorAll('.dropdown-item');
+
+   if (dropdownToggle) {
+     dropdownToggle.addEventListener('click', () => {
+       if(dropdown) dropdown.classList.toggle('open');
+     });
+
+     if(dropdownItems) {
+         dropdownItems.forEach(item => {
+           item.addEventListener('click', () => {
+             if(dropdownToggle) dropdownToggle.textContent = item.textContent;
+             if(dropdown) dropdown.classList.remove('open');
+           });
+         });
+     }
+
+     document.addEventListener('click', (event) => {
+       if (dropdown && !dropdown.contains(event.target)) {
+         dropdown.classList.remove('open');
+       }
+     });
+   }
+
 });
 
-//mudar o nome dos projetos//
-const projectNames = document.querySelectorAll('#projeto_nome');
-
-projectNames.forEach(projectName => {
-projectName.addEventListener('click', () => {
-projectName.contentEditable = true;
-projectName.focus();
- });
-projectName.addEventListener('blur', () => {
-projectName.contentEditable = false;
-console.log(`Project name updated to: ${projectName.textContent}`);
-});
-});
+// Removida a seção window.onload duplicada e com listeners no lugar errado.
+// Toda a lógica de inicialização e listeners deve estar dentro do DOMContentLoaded.

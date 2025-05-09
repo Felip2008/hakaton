@@ -44,6 +44,7 @@ function aplicarTema(isDarkMode) {
   }
 }
 
+//interruptor//
 function mudaracor() {
   const chaveSeletora = document.getElementById('switch-shadow');
   if (chaveSeletora) {
@@ -99,7 +100,9 @@ function setupImageListeners(selector, localStorageKey) {
    });
 }
 
+//mudar nome do projeto//
 
+//salvar nome do projeto//
 const LOCAL_STORAGE_PROJECT_NAMES_KEY = 'projectNames';
 
 function saveProjectName(index, name) {
@@ -140,6 +143,7 @@ function loadAndApplyProjectTexts() {
   }
 }
 
+//salvarbio//
 const LOCAL_STORAGE_BIO_KEY = 'bioData';
 
 function saveBioData() {
@@ -151,6 +155,7 @@ function saveBioData() {
       carreira: document.getElementById('carreira_bio')?.innerText || '',
       formacao: document.getElementById('formacao_bio')?.innerText || ''
   };
+  //diz que a bio foi salva//
   localStorage.setItem(LOCAL_STORAGE_BIO_KEY, JSON.stringify(bioData));
    alert('Alterações da Bio salvas!');
 }
@@ -169,6 +174,7 @@ function loadAndApplyBioData() {
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  //manter modo dark//
   const chaveSeletora = document.getElementById('switch-shadow');
   const textos = document.querySelectorAll('.texto');
 
@@ -233,6 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
+  //mudar img destaque//
+
+  //salvar img destaque//
   const LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY = 'highlightImagesData';
   loadAndApplyImages('.img_destaque', LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY);
   setupImageListeners('.img_destaque', LOCAL_STORAGE_HIGHLIGHT_IMAGES_KEY);
@@ -245,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadAndApplyImages('.img_destaque_c', LOCAL_STORAGE_HIGHLIGHT_IMAGES_C_KEY);
   setupImageListeners('.img_destaque_c', LOCAL_STORAGE_HIGHLIGHT_IMAGES_C_KEY);
 
+  //editar bio//
 
    loadAndApplyBioData();
 
@@ -284,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
        });
    }
 
-
+//mudar nome do projeto//
 
   loadAndApplyProjectNames();
 

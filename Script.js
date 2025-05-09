@@ -218,7 +218,7 @@ let coresIniciais = {
 });
 
 //mudar o nome dos projetos//
-const projectNames = document.querySelectorAll('.projeto_nome');
+const projectNames = document.querySelectorAll('#projeto_nome');
 
 projectNames.forEach(projectName => {
 projectName.addEventListener('click', () => {
